@@ -305,6 +305,9 @@
 
 // Additional commands that are not compatible with MultiWii
 #define MSP_STATUS_EX            150    //out message         cycletime, errors_count, CPU load, sensor present etc
+#ifdef SENSORS_TIMESTAMP
+#define MSP_RAW_IMU_STAMPED      151    //out message         msp raw imu, including timestamps
+#endif
 #define MSP_UID                  160    //out message         Unique device ID
 #define MSP_GPSSVINFO            164    //out message         get Signal Strength (only U-Blox)
 #define MSP_GPSSTATISTICS        166    //out message         get GPS debugging data

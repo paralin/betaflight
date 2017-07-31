@@ -15,3 +15,10 @@ gyro x increases (blue)
 acc y increases (green)
 mag y decreases (green)
 mag z increases (red)
+
+## Christian Stewart Experimental Fork
+
+Here are the changes made to BetaFlight in this fork:
+
+ - Add timestamps to sensor measurement structs. `EXTRAFLAGS=SENSORS_TIMESTAMP`
+ - 

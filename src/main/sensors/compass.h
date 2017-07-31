@@ -35,6 +35,9 @@ typedef enum {
 typedef struct mag_s {
     int32_t magADC[XYZ_AXIS_COUNT];
     float magneticDeclination;
+#ifdef SENSORS_TIMESTAMP
+    uint32_t lastUpdateTime;
+#endif
 } mag_t;
 
 extern mag_t mag;

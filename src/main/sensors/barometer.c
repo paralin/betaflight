@@ -29,6 +29,9 @@
 #include "drivers/bus.h"
 #include "drivers/bus_spi.h"
 #include "drivers/io.h"
+#ifdef SENSORS_TIMESTAMP
+#include "drivers/time.h"
+#endif
 
 #include "drivers/barometer/barometer.h"
 #include "drivers/barometer/barometer_bmp085.h"
@@ -120,6 +123,9 @@ static int32_t baroTemperature = 0;
 static int32_t baroGroundAltitude = 0;
 static int32_t baroGroundPressure = 8*101325;
 static uint32_t baroPressureSum = 0;
+#ifdef SENSORS_TIMESTAMP
+static uint32_t baroMeasurementTime = 0;
+#endif
 
 bool baroDetect(baroDev_t *dev, baroSensor_e baroHardwareToUse)
 {
@@ -290,6 +296,9 @@ uint32_t baroUpdate(void)
         case BAROMETER_NEEDS_SAMPLES:
             baro.dev.get_ut(&baro.dev);
             baro.dev.start_up(&baro.dev);
+#ifdef SENSORS_TIMESTAMP
+            baroMeasurementTime = micros();
+#endif
             state = BAROMETER_NEEDS_CALCULATION;
             return baro.dev.up_delay;
         break;
@@ -315,6 +324,9 @@ int32_t baroCalculateAltitude(void)
         BaroAlt_tmp = lrintf((1.0f - powf((float)(baroPressureSum / PRESSURE_SAMPLE_COUNT) / 101325.0f, 0.190295f)) * 4433000.0f); // in cm
         BaroAlt_tmp -= baroGroundAltitude;
         baro.BaroAlt = lrintf((float)baro.BaroAlt * CONVERT_PARAMETER_TO_FLOAT(barometerConfig()->baro_noise_lpf) + (float)BaroAlt_tmp * (1.0f - CONVERT_PARAMETER_TO_FLOAT(barometerConfig()->baro_noise_lpf))); // additional LPF to reduce baro noise
+#ifdef SENSORS_TIMESTAMP
+        baro.lastUpdateTime = baroMeasurementTime;
+#endif
     }
     else {
         baro.BaroAlt = 0;

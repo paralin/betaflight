@@ -43,6 +43,9 @@ typedef enum {
 typedef struct gyro_s {
     uint32_t targetLooptime;
     float gyroADCf[XYZ_AXIS_COUNT];
+#ifdef SENSORS_TIMESTAMP
+    uint32_t lastUpdateTime;
+#endif
 } gyro_t;
 
 extern gyro_t gyro;

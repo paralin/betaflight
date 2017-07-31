@@ -50,6 +50,9 @@
 #include "drivers/accgyro/accgyro_spi_mpu6500.h"
 #include "drivers/accgyro/accgyro_spi_mpu9250.h"
 #include "drivers/bus_spi.h"
+#ifdef SENSORS_TIMESTAMP
+#include "drivers/time.h"
+#endif
 
 #include "fc/config.h"
 #include "fc/runtime_config.h"
@@ -310,6 +313,9 @@ bool accInit(uint32_t gyroSamplingInverval)
     }
     acc.dev.acc_1G = 256; // set default
     acc.dev.initFn(&acc.dev); // driver initialisation
+#ifdef SENSORS_TIMESTAMP
+    acc.lastUpdateTime = 0;
+#endif
     // set the acc sampling interval according to the gyro sampling interval
     switch (gyroSamplingInverval) {  // Switch statement kept in place to change acc sampling interval in the future
     case 500:
@@ -455,6 +461,9 @@ void accUpdate(rollAndPitchTrims_t *rollAndPitchTrims)
         return;
     }
     acc.isAccelUpdatedAtLeastOnce = true;
+#ifdef SENSORS_TIMESTAMP
+    acc.lastUpdateTime = micros();
+#endif
 
     for (int axis = 0; axis < XYZ_AXIS_COUNT; axis++) {
         DEBUG_SET(DEBUG_ACCELEROMETER, axis, acc.dev.ADCRaw[axis]);

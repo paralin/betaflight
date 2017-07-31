@@ -51,6 +51,9 @@
 #include "drivers/bus_spi.h"
 #include "drivers/gyro_sync.h"
 #include "drivers/io.h"
+#ifdef SENSORS_TIMESTAMP
+#include "drivers/time.h"
+#endif
 
 #include "fc/runtime_config.h"
 
@@ -567,6 +570,9 @@ void gyroUpdateSensor(gyroSensor_t *gyroSensor)
         gyro.gyroADCf[X] = 0.0f;
         gyro.gyroADCf[Y] = 0.0f;
         gyro.gyroADCf[Z] = 0.0f;
+#ifdef SENSORS_TIMESTAMP
+        gyro.lastUpdateTime = 0;
+#endif
         // still calibrating, so no need to further process gyro data
         return;
     }
@@ -575,6 +581,9 @@ void gyroUpdateSensor(gyroSensor_t *gyroSensor)
     gyroDataAnalyse(&gyroSensor->gyroDev, gyroSensor->notchFilterDyn);
 #endif
 
+#ifdef SENSORS_TIMESTAMP
+    gyro.lastUpdateTime = micros();
+#endif
     for (int axis = 0; axis < XYZ_AXIS_COUNT; axis++) {
         // scale gyro output to degrees per second
         float gyroADCf = (float)gyroSensor->gyroDev.gyroADC[axis] * gyroSensor->gyroDev.scale;

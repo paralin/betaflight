@@ -172,6 +172,9 @@ void compassUpdate(uint32_t currentTime, flightDynamicsTrims_t *magZero)
         mag.magADC[axis] = magADCRaw[axis];
     }
     alignSensors(mag.magADC, magDev.magAlign);
+#ifdef SENSORS_TIMESTAMP
+    mag.lastUpdateTime = currentTime;
+#endif
 
     if (STATE(CALIBRATE_MAG)) {
         tCal = currentTime;

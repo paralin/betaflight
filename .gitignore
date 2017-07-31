@@ -1,6 +1,7 @@
 *.o
 .DS_Store
 *~
+.#*
 *.uvopt
 *.dep
 *.bak
@@ -37,3 +38,4 @@ stm32.mak
 # artefacts for CLion
 /cmake-build-debug/
 /CMakeLists.txt
+

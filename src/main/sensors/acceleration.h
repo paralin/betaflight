@@ -46,6 +46,9 @@ typedef struct acc_s {
     uint32_t accSamplingInterval;
     int32_t accSmooth[XYZ_AXIS_COUNT];
     bool isAccelUpdatedAtLeastOnce;
+#ifdef SENSORS_TIMESTAMP
+  uint32_t lastUpdateTime;
+#endif
 } acc_t;
 
 extern acc_t acc;

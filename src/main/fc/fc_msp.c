@@ -50,6 +50,9 @@
 #include "drivers/serial.h"
 #include "drivers/serial_escserial.h"
 #include "drivers/system.h"
+#ifdef SENSORS_TIMESTAMP
+#include "drivers/time.h"
+#endif
 #include "drivers/vcd.h"
 #include "drivers/vtx_common.h"
 #include "drivers/transponder_ir.h"
@@ -676,6 +679,37 @@ static bool mspFcProcessOutCommand(uint8_t cmdMSP, sbuf_t *dst)
             sbufWriteData(dst, ((uint8_t*)&flightModeFlags) + 4, byteCount);
         }
         break;
+
+#ifdef SENSORS_TIMESTAMP
+    case MSP_RAW_IMU_STAMPED:
+        {
+            // Hack scale due to choice of units for sensor data in multiwii
+            const uint8_t scale = (acc.dev.acc_1G > 512) ? 4 : 1;
+            sbufWriteU32(dst, (uint32_t)millis());
+            sbufWriteU32(dst, acc.lastUpdateTime);
+            if (acc.lastUpdateTime) {
+              acc.lastUpdateTime = 0;
+              for (int i = 0; i < 3; i++) {
+                  sbufWriteU16(dst, acc.accSmooth[i] / scale);
+              }
+            }
+            sbufWriteU32(dst, gyro.lastUpdateTime);
+            if (gyro.lastUpdateTime) {
+              gyro.lastUpdateTime = 0;
+              for (int i = 0; i < 3; i++) {
+                  sbufWriteU16(dst, gyroRateDps(i));
+              }
+            }
+            sbufWriteU32(dst, mag.lastUpdateTime);
+            if (mag.lastUpdateTime) {
+              mag.lastUpdateTime = 0;
+              for (int i = 0; i < 3; i++) {
+                  sbufWriteU16(dst, mag.magADC[i]);
+              }
+            }
+        }
+        break;
+#endif
 
     case MSP_RAW_IMU:
         {
@@ -2042,7 +2076,7 @@ mspResult_e mspFcProcessCommand(mspPacket_t *cmd, mspPacket_t *reply, mspPostPro
         ret = MSP_RESULT_ACK;
 #endif
     } else {
-        ret = mspCommonProcessInCommand(cmdMSP, src);
+      ret = mspCommonProcessInCommand(cmdMSP, src);
     }
     reply->result = ret;
     return ret;

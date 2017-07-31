@@ -49,6 +49,9 @@ typedef struct baro_s {
     baroDev_t dev;
     int32_t BaroAlt;
     int32_t baroTemperature;             // Use temperature for telemetry
+#ifdef SENSORS_TIMESTAMP
+    uint32_t lastUpdateTime;
+#endif
 } baro_t;
 
 extern baro_t baro;
